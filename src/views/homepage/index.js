@@ -1,6 +1,6 @@
 import React from 'react';
 import * as S from './styles';
-import ExtractItem from './extractItem';
+import ExtractItem from '../../components/extractItem';
 
 const DATA = [
   {
