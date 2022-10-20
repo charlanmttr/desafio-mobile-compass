@@ -6,20 +6,20 @@ import api from '../../utils/api';
 
 function Homepage() {
   const [totalAmount, setTotalAmount] = useState(0);
-  const [details, setDetails] = useState([]);
+  const [list, setList] = useState([]);
   const [offset, setOffset] = useState(0);
 
   const getBalance = async () => api.get('/myBalance').then(({ data }) => data.amount);
-  const getDetails = async () => api.get(`myStatement/10/${offset}`).then(({ data }) => data.items);
+  const getList = async () => api.get(`myStatement/10/${offset}`).then(({ data }) => data.items);
 
   useEffect(() => {
     const getData = async () => {
       Promise.all([
         getBalance(),
-        getDetails(),
+        getList(),
       ]).then(([amount, items]) => {
         setTotalAmount(amount);
-        setDetails(items);
+        setList(items);
       })
         .catch((err) => console.log(err));
     };
@@ -39,8 +39,8 @@ function Homepage() {
       <S.ExtractArea>
         <S.Title>Suas movimentações</S.Title>
         <S.Flatlist
-          data={details}
-          renderItem={(item) => <ExtractItem data={item} />}
+          data={list}
+          renderItem={({ item }) => <ExtractItem data={item} />}
           keyExtractor={(item) => item.id}
         />
       </S.ExtractArea>
