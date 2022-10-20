@@ -1,33 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as S from './styles';
 import ExtractItem from '../../components/extractItem';
 
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-];
+import api from '../../utils/api';
 
 function Homepage() {
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [details, setDetails] = useState([]);
+  const [offset, setOffset] = useState(0);
+
+  const getBalance = async () => api.get('/myBalance').then(({ data }) => data.amount);
+  const getDetails = async () => api.get(`myStatement/10/${offset}`).then(({ data }) => data.items);
+
+  useEffect(() => {
+    const getData = async () => {
+      Promise.all([
+        getBalance(),
+        getDetails(),
+      ]).then(([amount, items]) => {
+        setTotalAmount(amount);
+        setDetails(items);
+      })
+        .catch((err) => console.log(err));
+    };
+
+    getData();
+  }, []);
+
   return (
     <S.Container>
       <S.BalanceArea>
         <S.Title>Seu saldo</S.Title>
-        <S.Title>R$1000,00</S.Title>
+        <S.Title>
+          R$
+          {totalAmount}
+        </S.Title>
       </S.BalanceArea>
       <S.ExtractArea>
         <S.Title>Suas movimentações</S.Title>
         <S.Flatlist
-          data={DATA}
+          data={details}
           renderItem={(item) => <ExtractItem data={item} />}
           keyExtractor={(item) => item.id}
         />
